@@ -1,0 +1,34 @@
+{
+  "name": "minecraft-statusline",
+  "version": "1.0.0",
+  "description": "A Minecraft-themed statusline for Claude Code — hearts, food, and XP bars for your rate limits and context window",
+  "license": "MIT",
+  "author": "Jonah Mabry",
+  "keywords": [
+    "claude-code",
+    "statusline",
+    "minecraft",
+    "cli"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonahmabry/minecraft-statusline.git"
+  },
+  "homepage": "https://github.com/jonahmabry/minecraft-statusline#readme",
+  "bugs": {
+    "url": "https://github.com/jonahmabry/minecraft-statusline/issues"
+  },
+  "bin": {
+    "minecraft-statusline": "bin/install.js"
+  },
+  "files": [
+    "bin",
+    "bin/statusline.sh",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "type": "commonjs"
+}
