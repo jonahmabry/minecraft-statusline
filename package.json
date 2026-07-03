@@ -1,6 +1,6 @@
 {
   "name": "minecraft-statusline",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Minecraft-themed statusline for Claude Code — hearts, food, and XP bars for your rate limits and context window",
   "license": "MIT",
   "author": "Jonah Mabry",
