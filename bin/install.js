@@ -3,28 +3,23 @@
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
-const { execSync } = require("child_process");
 
 const CLAUDE_DIR = path.join(os.homedir(), ".claude");
 const SETTINGS_PATH = path.join(CLAUDE_DIR, "settings.json");
 const SETTINGS_BACKUP_PATH = path.join(CLAUDE_DIR, "settings.json.bak");
-const SCRIPT_DEST = path.join(CLAUDE_DIR, "minecraft-statusline.sh");
-// The statusLine command is run through bash. On Windows path.join yields
-// backslashes, which bash treats as escape sequences (C:\Users -> CUsers), so the
-// script is never found. Use forward slashes and quote to survive spaces in the path.
-const SCRIPT_DEST_CMD = SCRIPT_DEST.split(path.sep).join("/");
-const STATUSLINE_COMMAND = `bash "${SCRIPT_DEST_CMD}"`;
-const SCRIPT_SRC = path.join(__dirname, "statusline.sh");
+const SCRIPT_DEST = path.join(CLAUDE_DIR, "minecraft-statusline.js");
+const SCRIPT_SRC = path.join(__dirname, "statusline.js");
 const PREVIOUS_STATUSLINE_PATH = path.join(CLAUDE_DIR, "minecraft-statusline.previous-statusline.json");
 
-function commandExists(cmd) {
-  try {
-    execSync(`command -v ${cmd}`, { stdio: "ignore" });
-    return true;
-  } catch {
-    return false;
-  }
-}
+// Build the statusLine command. Two Windows/cross-platform pitfalls to avoid:
+//   1. path.join yields backslashes, which a shell may mangle — use forward slashes and quote.
+//   2. Claude Code may be launched from a GUI where a version-managed `node` (nvm/fnm/volta)
+//      isn't on PATH. Bake in the absolute path of the Node running this installer so the
+//      command resolves regardless of how Claude Code was started.
+const toCmdPath = (p) => p.split(path.sep).join("/");
+const NODE_BIN = toCmdPath(process.execPath);
+const SCRIPT_DEST_CMD = toCmdPath(SCRIPT_DEST);
+const STATUSLINE_COMMAND = `"${NODE_BIN}" "${SCRIPT_DEST_CMD}"`;
 
 function readSettings() {
   if (!fs.existsSync(SETTINGS_PATH)) return {};
@@ -42,11 +37,6 @@ function timestamp() {
 }
 
 function install() {
-  const missing = ["jq", "curl", "git"].filter((cmd) => !commandExists(cmd));
-  if (missing.length > 0) {
-    console.warn(`Warning: missing recommended dependencies: ${missing.join(", ")}`);
-  }
-
   fs.mkdirSync(CLAUDE_DIR, { recursive: true });
 
   if (fs.existsSync(SCRIPT_DEST)) {
@@ -55,7 +45,6 @@ function install() {
     console.log(`Backed up existing script to ${backupPath}`);
   }
   fs.copyFileSync(SCRIPT_SRC, SCRIPT_DEST);
-  fs.chmodSync(SCRIPT_DEST, 0o755);
   console.log(`Installed statusline script to ${SCRIPT_DEST}`);
 
   let settings = {};
@@ -75,7 +64,10 @@ function install() {
   // Only capture statusLine as "previous" if it isn't already ours — otherwise a
   // reinstall/update would overwrite the sidecar with our own config, and
   // --uninstall would restore minecraft-statusline instead of the user's original.
-  const isOurStatusLine = settings.statusLine && settings.statusLine.command === STATUSLINE_COMMAND;
+  // Match by filename so upgrades from older versions (bash .sh, or a different
+  // node path) are still recognized as ours rather than captured as the user's.
+  const isOurStatusLine =
+    settings.statusLine && /minecraft-statusline\.(js|sh)/.test(settings.statusLine.command || "");
   if (settings.statusLine && !isOurStatusLine) {
     fs.writeFileSync(PREVIOUS_STATUSLINE_PATH, JSON.stringify(settings.statusLine, null, 2) + "\n");
   }

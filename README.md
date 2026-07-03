@@ -31,13 +31,16 @@ npx minecraft-statusline
 ```
 
 This backs up any existing `~/.claude/settings.json` and statusline script, installs
-`~/.claude/minecraft-statusline.sh`, and points Claude Code's `statusLine` setting at it.
+`~/.claude/minecraft-statusline.js`, and points Claude Code's `statusLine` setting at it.
 
 ## Requirements
 
 - [Claude Code](https://claude.com/claude-code)
-- `jq` (required)
-- `git` and `curl` (for branch info and rate limits — optional, but recommended)
+- [Node.js](https://nodejs.org) — you already have it if you can run `npx`; the statusline itself
+  runs on Node, so there's nothing else to install
+- `git` (optional — only used to show the current branch)
+
+Works on Windows, macOS, and Linux with no extra dependencies (no `jq` or `bash` needed).
 
 ## Uninstall
 
@@ -49,5 +52,5 @@ Restores your previous `settings.json` and removes the installed script.
 
 ## Customize
 
-The installed script lives at `~/.claude/minecraft-statusline.sh` — edit it directly to change
+The installed script lives at `~/.claude/minecraft-statusline.js` — edit it directly to change
 colors, icons, or segments.
