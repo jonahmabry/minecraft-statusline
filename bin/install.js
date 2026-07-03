@@ -9,6 +9,11 @@ const CLAUDE_DIR = path.join(os.homedir(), ".claude");
 const SETTINGS_PATH = path.join(CLAUDE_DIR, "settings.json");
 const SETTINGS_BACKUP_PATH = path.join(CLAUDE_DIR, "settings.json.bak");
 const SCRIPT_DEST = path.join(CLAUDE_DIR, "minecraft-statusline.sh");
+// The statusLine command is run through bash. On Windows path.join yields
+// backslashes, which bash treats as escape sequences (C:\Users -> CUsers), so the
+// script is never found. Use forward slashes and quote to survive spaces in the path.
+const SCRIPT_DEST_CMD = SCRIPT_DEST.split(path.sep).join("/");
+const STATUSLINE_COMMAND = `bash "${SCRIPT_DEST_CMD}"`;
 const SCRIPT_SRC = path.join(__dirname, "statusline.sh");
 const PREVIOUS_STATUSLINE_PATH = path.join(CLAUDE_DIR, "minecraft-statusline.previous-statusline.json");
 
@@ -70,14 +75,14 @@ function install() {
   // Only capture statusLine as "previous" if it isn't already ours — otherwise a
   // reinstall/update would overwrite the sidecar with our own config, and
   // --uninstall would restore minecraft-statusline instead of the user's original.
-  const isOurStatusLine = settings.statusLine && settings.statusLine.command === `bash ${SCRIPT_DEST}`;
+  const isOurStatusLine = settings.statusLine && settings.statusLine.command === STATUSLINE_COMMAND;
   if (settings.statusLine && !isOurStatusLine) {
     fs.writeFileSync(PREVIOUS_STATUSLINE_PATH, JSON.stringify(settings.statusLine, null, 2) + "\n");
   }
 
   settings.statusLine = {
     type: "command",
-    command: `bash ${SCRIPT_DEST}`,
+    command: STATUSLINE_COMMAND,
     refreshInterval: 10,
   };
   writeSettings(settings);
