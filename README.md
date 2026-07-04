@@ -1,7 +1,7 @@
 # ⛏️ minecraft-statusline
 
 [![npm version](https://img.shields.io/npm/v/minecraft-statusline.svg)](https://www.npmjs.com/package/minecraft-statusline)
-[![npm downloads](https://img.shields.io/npm/dm/minecraft-statusline.svg)](https://www.npmjs.com/package/minecraft-statusline)
+[![npm downloads](https://img.shields.io/npm/dw/minecraft-statusline.svg)](https://www.npmjs.com/package/minecraft-statusline)
 [![license](https://img.shields.io/npm/l/minecraft-statusline.svg)](./LICENSE)
 
 A Minecraft-themed statusline for [Claude Code](https://claude.com/claude-code). Your rate limits
